@@ -36,10 +36,10 @@
     "razorpay": "^2.9.6",
     "twilio": "^5.12.2",
     "winston": "^3.19.0",
-    "xss": "^1.0.15"
+    "xss": "^1.0.15",
+     "morgan": "^1.10.1",
   },
   "devDependencies": {
-    "morgan": "^1.10.1",
     "nodemon": "^3.1.14"
   }
 }
