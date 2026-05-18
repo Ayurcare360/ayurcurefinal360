@@ -1,5 +1,5 @@
-import blog1Image from '../images/blog1.jpeg';
-import blog2Image from '../images/blog2.jpeg';
+import blog1Image from '../images/Blog1.jpeg';
+import blog2Image from '../images/Blog2.jpeg';
 
 export const websiteBlogs = [
     {
