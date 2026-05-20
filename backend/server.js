@@ -26,9 +26,16 @@ app.use(helmet({
     contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
 }));
 
-// SECURE FIX: Dynamic CORS Configuration with strict methods and headers
+// ==========================================
+// ⭐ THE FIX: Multi-Domain CORS Array ⭐
+// ==========================================
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: [
+        'https://www.ayurcare360.com', 
+        'https://ayurcare360.com',
+        'https://ayurcurefinal360.vercel.app',
+        'http://localhost:5173'
+    ],
     credentials: true, // Required for secure cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
