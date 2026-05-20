@@ -241,7 +241,7 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
               <img 
                 src={sanskritRing} 
                 alt="Sanskrit Shloka ring" 
-                className="absolute top-1.25 left-1.2  w-[115%] h-[115%] max-w-none object-contain animate-[spin_20s_linear_infinite_reverse] z-10 drop-shadow-sm pointer-events-none"
+                className="absolute top-1 left-1.1  w-[100%] h-[100%] max-w-none object-contain animate-[spin_20s_linear_infinite_reverse] z-10 drop-shadow-sm pointer-events-none"
               />
 
             </div>
