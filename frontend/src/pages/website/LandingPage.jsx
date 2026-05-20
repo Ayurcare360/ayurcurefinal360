@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { websiteBlogs } from '../../data/websiteBlogs';
-import globe from '../../images/globe-removebg-preview.jpeg'
+import globe from '../../images/globe-removebg-preview-removebg-preview.png';
+import sanskritRing from "../../images/sanskritText-removebg-preview.png" // Make sure your transparent PNG is here!
 import asthaImg from '../../images/DrAstha.jpeg';
-import abhiImg from '../../images/DrAbhi.jpeg'
+import abhiImg from '../../images/DrAbhi.jpeg';
 
 // --- ANIMATION WRAPPER COMPONENT ---
 const ScrollReveal = ({ children, direction = 'up', className = "" }) => {
@@ -62,13 +63,11 @@ const checkAuthStatus = () => {
 const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const fromStickyLogo = location.state?.fromStickyLogo; // Check if user came from sticky logo
+  const fromStickyLogo = location.state?.fromStickyLogo; 
 
-  // Initialize with our robust auth checker
   const [isLoggedIn, setIsLoggedIn] = useState(() => propIsLoggedIn || checkAuthStatus().loggedIn);
   const [userRole, setUserRole] = useState(() => propUserRole || checkAuthStatus().role);
 
-  // Dynamic Event Listeners to prevent Stale State
   useEffect(() => {
     const updateAuth = () => {
       const { loggedIn, role } = checkAuthStatus();
@@ -76,7 +75,7 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
       setUserRole(role);
     };
 
-    updateAuth(); // Run immediately on mount
+    updateAuth(); 
 
     window.addEventListener('storage', updateAuth);
     window.addEventListener('focus', updateAuth);
@@ -89,12 +88,11 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
 
   const handleLogout = () => {
     if (onLogout) onLogout();
-    // Clear all possible auth storage keys
     localStorage.removeItem('role');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setIsLoggedIn(false);
-    navigate('/', { replace: true }); // Clear state flag
+    navigate('/', { replace: true }); 
   };
 
   const handleDashboardClick = () => {
@@ -103,10 +101,8 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
     else navigate('/patient/dashboard');
   };
 
-  // Smart Routing for all CTA Buttons + Bypass Logic
   const handleHeroAction = () => {
     if (fromStickyLogo) {
-      // THE BYPASS LOGIC: Inject dummy tokens to bypass the ProtectedRoute checks
       localStorage.setItem('token', 'bypass-token');
       localStorage.setItem('role', 'patient');
       localStorage.setItem('user', JSON.stringify({ role: 'patient', name: 'Bypass User' }));
@@ -226,24 +222,32 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
           <span className="material-symbols-outlined absolute left-1/2 top-1/2 bird-1 text-[#2F6F4E]/30 text-4xl">nest_eco_leaf</span>
           <span className="material-symbols-outlined absolute left-1/2 top-1/2 bird-2 text-[#5F8F6B]/30 text-3xl">nest_eco_leaf</span>
         </div>
-        <div className="relative z-10 w-full flex items-center justify-center overflow-visible mb-8 md:mb-12">
+        
+        {/* === UPDATED GLOBE & SANSKRIT RING LAYER === */}
+       <div className="relative z-10 w-full flex items-center justify-center overflow-visible mb-8 md:mb-12">
           <div className="relative w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] flex items-center justify-center">
+            
+            {/* The Parent Container */}
             <div className="relative w-full h-full flex items-center justify-center">
-              <img alt="a vibrant textured globe in rich mossy greens and warm terracotta earthy tones with golden sunlight highlights" className="w-full h-full object-contain rounded-full filter saturate-[1.4] contrast-[1.1] animate-[spin_20s_linear_infinite]" src={globe} />
+              
+              {/* --- 1. THE SPINNING GLOBE (Background Layer) --- */}
+              <img 
+                alt="vibrant textured globe" 
+                className="absolute inset-0 w-full h-full object-cover rounded-full filter saturate-[1.4] contrast-[1.1] animate-[spin_20s_linear_infinite] z-0" 
+                src={globe} 
+              />
 
-              <div className="absolute inset-[-2%] flex items-center justify-center z-10 animate-[spin_20s_linear_infinite_reverse]">
-                <svg className="w-full h-full overflow-visible" viewBox="0 0 500 500">
-                  <defs><path d="M 250, 250 m -210, 0 a 210,210 0 1,1 420,0 a 210,210 0 1,1 -420,0" id="textPath"></path></defs>
-                  <text fontFamily="Noto Serif" fontSize="18" fontWeight="500" letterSpacing="3">
-                    <textPath href="#textPath" startOffset="0%" style={{ fill: '#C8A96A', fontWeight: 600 }}>
-                      स्वस्थस्य स्वास्थ्य रक्षणं, आतुरस्य विकार प्रशमनं च • स्वस्थस्य स्वास्थ्य रक्षणं, आतुरस्य विकार प्रशमनं च • स्वस्थस्य स्वास्थ्य रक्षणं, आतुरस्य विकार प्रशमनं च •
-                    </textPath>
-                  </text>
-                </svg>
-              </div>
+              {/* --- 2. THE SANSKRIT RING (Foreground Layer) --- */}
+              <img 
+                src={sanskritRing} 
+                alt="Sanskrit Shloka ring" 
+                className="absolute top-1.25 left-1.2  w-[115%] h-[115%] max-w-none object-contain animate-[spin_20s_linear_infinite_reverse] z-10 drop-shadow-sm pointer-events-none"
+              />
+
             </div>
           </div>
         </div>
+        
         <ScrollReveal>
           <div className="relative z-20 text-center px-6 max-w-4xl mx-auto pb-16 md:pb-20">
             <h1 className="font-['Noto_Serif'] text-4xl sm:text-5xl md:text-7xl mb-4 md:mb-6 tracking-tighter text-[#1E1E1E] drop-shadow-sm font-bold">AyurCare 360</h1>
@@ -488,9 +492,6 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
           </div>
           <ScrollReveal>
             <div className="flex flex-col items-center gap-8">
-              {/* <Link to="/about" className="inline-flex items-center gap-2 text-[#2F6F4E] font-bold text-lg md:text-xl hover:underline underline-offset-4">
-                View all conditions <span className="material-symbols-outlined">arrow_forward</span>
-              </Link> */}
               <button onClick={handleHeroAction} className="bg-[#2F6F4E] text-white px-8 py-4 rounded-xl font-['Noto_Serif'] font-bold text-xl shadow-lg hover:scale-105 transition-transform">
                 {fromStickyLogo ? 'Go to Dashboard' : (isLoggedIn ? 'Go to Dashboard' : 'Start Healing for Your Condition')}
               </button>
@@ -674,7 +675,6 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
           {/* Navigation Links */}
           <nav className="flex flex-wrap justify-center gap-x-6 md:gap-x-12 gap-y-4 mb-8">
             <Link to="/blogs" className="text-[#376645] font-['Inter'] text-sm md:text-base font-medium hover:opacity-70 transition-opacity">The Herbarium</Link>
-            {/* <Link to="/about" className="text-[#376645] font-['Inter'] text-sm md:text-base font-medium hover:opacity-70 transition-opacity">Dosha Quiz</Link> */}
             <Link to="/privacy" className="text-[#376645] font-['Inter'] text-sm md:text-base font-medium hover:opacity-70 transition-opacity">Privacy Policy</Link>
             <Link to="/login" className="text-[#376645] font-['Inter'] text-sm md:text-base font-medium hover:opacity-70 transition-opacity">Practitioner Login</Link>
           </nav>
