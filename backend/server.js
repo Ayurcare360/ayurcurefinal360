@@ -98,6 +98,11 @@ app.use('/api/auth', authLimiter);
 // 3. API ROUTES & STATIC FILES
 // ==========================================
 
+// Health check route to keep Render awake
+app.get('/ping', (req, res) => {
+  res.status(200).send('Server is awake and healthy!');
+});
+
 // SECURE FIX: Protect static uploads directory so the public cannot read sensitive health/user images!
 app.use('/uploads', requireAuth, express.static(path.join(__dirname, 'uploads')));
 
