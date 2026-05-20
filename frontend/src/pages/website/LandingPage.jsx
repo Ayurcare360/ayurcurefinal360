@@ -234,7 +234,7 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
               <div className="absolute inset-[-2%] flex items-center justify-center z-10 animate-[spin_20s_linear_infinite_reverse]">
                 <svg className="w-full h-full overflow-visible" viewBox="0 0 500 500">
                   <defs><path d="M 250, 250 m -210, 0 a 210,210 0 1,1 420,0 a 210,210 0 1,1 -420,0" id="textPath"></path></defs>
-                  <text fontFamily="Noto Serif" fontSize="18" fontWeight="500" letterSpacing="0">
+                  <text fontFamily="Noto Serif" fontSize="18" fontWeight="500" letterSpacing="3">
                     <textPath href="#textPath" startOffset="0%" style={{ fill: '#C8A96A', fontWeight: 600 }}>
                       स्वस्थस्य स्वास्थ्य रक्षणं, आतुरस्य विकार प्रशमनं च • स्वस्थस्य स्वास्थ्य रक्षणं, आतुरस्य विकार प्रशमनं च • स्वस्थस्य स्वास्थ्य रक्षणं, आतुरस्य विकार प्रशमनं च •
                     </textPath>
