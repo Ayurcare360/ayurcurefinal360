@@ -1,45 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { websiteBlogs } from '../../data/websiteBlogs';
-import globe from '../../images/globe-removebg-preview-removebg-preview.png';
-import sanskritRing from "../../images/sanskritText-removebg-preview.png" // Make sure your transparent PNG is here!
-import asthaImg from '../../images/DrAstha.jpeg';
+
 import abhiImg from '../../images/DrAbhi.jpeg';
+import atulImg from '../../images/DrAtul.jpeg'; 
+import mehakImg from '../../images/DrMehak.jpeg'; 
+import asthaBgremove from '../../images/DrAstha-removebg-preview.png';
+import atulBgremove from '../../images/DrAtul-removebg-preview.png';
+import mehakBgremove from '../../images/DrMehak-removebg-preview.png';
+import asthaImg from '../../images/DrAstha.jpeg';
+import hair_loss from "../../images/hair_loss.png";
+import knee_pain from  "../../images/knee_pain.png";
+import skin_issue from "../../images/skin_issue.png";
+import women_health from "../../images/women_health.png";
+import logo from "../../images/Favicon_up.png";
 
-// --- ANIMATION WRAPPER COMPONENT ---
-const ScrollReveal = ({ children, direction = 'up', className = "" }) => {
-  let x = 0;
-  let y = 0;
-
-  if (direction === 'left') x = -50;
-  if (direction === 'right') x = 50;
-  if (direction === 'up') y = 50;
-
-  const variants = {
-    hidden: { opacity: 0, x, y },
-    visible: {
-      opacity: 1,
-      x: 0,
-      y: 0,
-      transition: { duration: 0.8, ease: "easeOut" }
-    }
-  };
-
-  return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.15 }}
-      variants={variants}
-      className={`w-full ${className}`}
-    >
-      {children}
-    </motion.div>
-  );
-};
-
-// --- HELPER: ROBUST AUTH CHECKER ---
 const checkAuthStatus = () => {
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
@@ -67,6 +41,8 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => propIsLoggedIn || checkAuthStatus().loggedIn);
   const [userRole, setUserRole] = useState(() => propUserRole || checkAuthStatus().role);
+  
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const updateAuth = () => {
@@ -101,7 +77,7 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
     else navigate('/patient/dashboard');
   };
 
-  const handleHeroAction = () => {
+  const handleMenuAction = () => {
     if (fromStickyLogo) {
       localStorage.setItem('token', 'bypass-token');
       localStorage.setItem('role', 'patient');
@@ -122,586 +98,648 @@ const LandingPage = ({ isLoggedIn: propIsLoggedIn, userRole: propUserRole, onLog
   };
 
   return (
-    <div className="bg-[#F5F3EA] text-[#1E1E1E] font-['Inter'] selection:bg-[#bbefc5] selection:text-[#00210d] overflow-x-hidden">
-
-      {/* --- STYLES, FONTS, AND ICON IMPORTS --- */}
+    <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0');
+        :root{
+          --cream:#FBF4E8;--cream2:#F3EADB;--gd:#1A3C2A;--gm:#2D6B45;--gl:#E8F0E8;--gp:#F0F7F0;
+          --gold:#C4A35A;--goldL:#D4B56A;--td:#1A1A1A;--tm:#4A4A4A;--tl:#6B6B6B;--w:#FFF;
+          --wa:#25D366;--coral:#E8613A;--coral-light:#FDEEE9;
+        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--td);line-height:1.6;overflow-x:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact}
         
-        .material-symbols-outlined { 
-            font-family: 'Material Symbols Outlined' !important;
-            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; 
+        .header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--w);border-bottom:1px solid #E8E0D0;position:sticky;top:0;z-index:100}
+        .header-left{display:flex;align-items:center;gap:10px}
+        .logo-c{width:34px;height:34px;background:var(--gd);border-radius:50%;display:flex;align-items:center;justify-content:center}
+        .logo-c svg{width:20px;height:20px}
+        .brand{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--gd)}
+        .nav-d{display:none}
+        .nav-d a, .nav-d span{cursor:pointer;text-decoration:none;color:var(--tm);font-size:13px;font-weight:500}
+        .btn-wa-header{display:inline-flex;align-items:center;gap:6px;background:var(--wa);color:var(--w);padding:8px 16px;border-radius:24px;font-size:12px;font-weight:700;text-decoration:none}
+        .btn-wa-header svg{width:16px;height:16px;fill:var(--w)}
+        .hamburger{display:flex;flex-direction:column;gap:4px;cursor:pointer;padding:4px}
+        .hamburger span{display:block;width:20px;height:2px;background:var(--gd);border-radius:1px}
+
+        .mobile-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          background: var(--w);
+          display: flex;
+          flex-direction: column;
+          padding: 20px;
+          gap: 16px;
+          border-bottom: 1px solid #E8E0D0;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+          z-index: 99;
         }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .image-richness { filter: saturate(1.1) contrast(1.02) sepia(0.02); }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        .mobile-menu a, .mobile-menu span {
+          text-decoration: none;
+          color: var(--tm);
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
         }
-        .float-animate { animation: float 6s ease-in-out infinite; }
-        @keyframes fly-bird-1 {
-            0% { transform: translate(-50px, 50px) rotate(0deg) scale(0); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translate(-300px, -200px) rotate(-15deg) scale(1.2); opacity: 0; }
+
+        .hero{background:linear-gradient(160deg,#1A3C2A 0%,#234B35 40%,#2D6B45 100%);padding:28px 20px 0;position:relative;overflow:hidden}
+        .hero-text{position:relative;z-index:2}
+        .hero-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border:1px solid rgba(196,163,90,.4);padding:5px 14px;border-radius:20px;margin-bottom:16px}
+        .hero-pill span{font-size:12px;font-weight:600;color:var(--goldL)}
+        .hero h1{font-family:'Playfair Display',serif;font-size:30px;font-weight:800;line-height:1.18;color:var(--w);margin-bottom:10px}
+        .hero h1 .highlight{color:var(--goldL)}
+        .hero-desc{font-size:14px;color:rgba(255,255,255,.8);line-height:1.6;margin-bottom:20px;max-width:500px}
+        .hero-desc strong{color:var(--w)}
+        .btn-wa-hero{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--coral);color:var(--w);padding:16px 24px;border-radius:14px;font-size:16px;font-weight:800;text-decoration:none;width:100%;box-shadow:0 6px 24px rgba(232,97,58,.4)}
+        .btn-wa-hero svg{width:22px;height:22px;fill:var(--w)}
+        .hero-note{font-size:11px;color:rgba(255,255,255,.55);margin-top:8px;display:flex;align-items:center;gap:4px}
+        .hero-note::before{content:'✓';color:var(--wa);font-weight:700}
+
+        .hero-doctors{position:relative;margin-top:30px;display:flex;justify-content:center;align-items:flex-end;min-height:280px}
+        .hero-circle{position:absolute;top:20px;right:-10px;width:300px;height:300px;border-radius:50%;background:var(--w);opacity:0.12;z-index:0}
+        .doctor-img-area{position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center;gap:0;margin:0}
+        .doctor-placeholder{display:flex;flex-direction:column;align-items:center}
+        
+        .doctor-avatar{background:transparent;border:none;display:flex;align-items:flex-end;justify-content:center}
+        .doctor-avatar img{width:160px; max-width:none !important; height:auto; object-fit:contain; object-position:bottom center; filter:drop-shadow(0 15px 25px rgba(0,0,0,0.3));}
+        
+        .doctor-placeholder:nth-child(2) .doctor-avatar{z-index:3;position:relative}
+        .doctor-placeholder:nth-child(2) .doctor-avatar img{width:220px; z-index:3;}
+        .doctor-placeholder:nth-child(1){transform:translateX(60px);z-index:2}
+        .doctor-placeholder:nth-child(3){transform:translateX(-60px);z-index:1}
+
+        /* --- HERO BADGES - STRICTLY NO SCROLL, SINGLE ROW --- */
+        .float-badges {
+          position: relative;
+          z-index: 4;
+          display: flex;
+          flex-wrap: nowrap; /* Forces badges to stay on one line */
+          gap: 4px; /* Tightened gap */
+          justify-content: center;
+          margin-top: -10px;
+          padding: 0 6px 20px;
+          width: 100%;
         }
-        @keyframes fly-bird-2 {
-            0% { transform: translate(50px, 50px) rotate(0deg) scale(0); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translate(400px, -150px) rotate(20deg) scale(1.1); opacity: 0; }
+        .float-badge {
+          flex: 1 1 0; /* Forces them to shrink evenly and perfectly fit the screen */
+          min-width: 0; /* Required to allow them to shrink below content size */
+          background: var(--w);
+          border-radius: 10px;
+          padding: 6px 2px; /* Very tight padding to maximize text space */
+          display: flex;
+          flex-direction: column; /* Stack icon on top of text */
+          align-items: center;
+          text-align: center;
+          gap: 4px;
+          box-shadow: 0 4px 12px rgba(0,0,0,.15);
+          border: 1px solid #F0EBE0;
         }
-        .bird-1 { animation: fly-bird-1 15s linear infinite; }
-        .bird-2 { animation: fly-bird-2 18s linear infinite; animation-delay: 4s; }
+        .float-badge .badge-icon {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: var(--gp);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 12px;
+          flex-shrink: 0;
+        }
+        .float-badge strong {
+          font-size: 9px;
+          color: var(--gd);
+          display: block;
+          line-height: 1.2;
+          white-space: normal;
+        }
+        .float-badge span {
+          font-size: 8px;
+          color: var(--tl);
+          display: block;
+          white-space: normal;
+          line-height: 1.2;
+        }
+
+        .schedule-bar{background:linear-gradient(135deg,var(--gd),var(--gm));padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:8px}
+        .schedule-bar p{font-size:14px;font-weight:700;color:var(--w)}
+        .schedule-bar svg{width:18px;height:18px;fill:var(--w)}
+
+        .sec{padding:40px 20px}
+        
+        /* --- GAP FIX: Remove bottom padding of conditions sec --- */
+        .conditions-sec{background:var(--cream);padding:36px 20px 0;}
+        /* Pulls the "How it Works" section up tighter to the button */
+        .conditions-sec + .sec { padding-top: 24px; }
+        
+        .sec-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--gd);text-align:center;margin-bottom:6px;line-height:1.25}
+        .sec-sub{text-align:center;font-size:13px;color:var(--tl);margin-bottom:28px;line-height:1.5}
+
+        .cond-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+        .cond-card{display:block;border-radius:14px;overflow:hidden;position:relative;text-decoration:none;aspect-ratio:3/4;border:1px solid #E0D8C8; background:#1A3C2A}
+        .cond-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s; opacity: 0.8}
+        .cond-card:active .cond-img{transform:scale(1.05)}
+        .cond-overlay{position:absolute;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(0deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.45) 60%,transparent 100%)}
+        .cond-overlay h3{font-family:'Playfair Display',serif;font-size:17px;color:var(--w);margin-bottom:3px}
+        .cond-overlay p{font-size:10px;color:rgba(255,255,255,.75);line-height:1.4;margin-bottom:8px}
+        .cond-cta{display:inline-flex;align-items:center;gap:4px;background:var(--wa);color:var(--w);padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700}
+        
+        /* GAP FIX: Set margin-bottom to 0 so it aligns cleanly to the bottom */
+        .cond-other{display:flex;align-items:center;gap:12px;padding:16px 18px;background:var(--w);border:1.5px solid #D8D0C0;border-radius:14px;text-decoration:none;color:var(--gd);margin-bottom:0;}
+        .cond-other .emoji{font-size:28px;flex-shrink:0}
+        .cond-other strong{font-size:15px;display:block;margin-bottom:2px;color:var(--gd)}
+        .cond-other span{font-size:11px;color:var(--tl);line-height:1.4}
+        .cond-other .arrow{font-size:20px;color:var(--wa);font-weight:700;margin-left:auto;flex-shrink:0}
+
+        .steps{display:flex;flex-direction:column;gap:14px}
+        .step{display:flex;gap:14px;align-items:flex-start;padding:16px;background:var(--w);border-radius:14px;border:1px solid #E8E0D0}
+        .step-num{width:38px;height:38px;min-width:38px;background:var(--wa);color:var(--w);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+        .step h3{font-family:'Playfair Display',serif;font-size:16px;color:var(--gd);margin-bottom:3px}
+        .step p{font-size:13px;color:var(--tm);line-height:1.5}
+
+        .doctors-sec{background:var(--w)}
+        .doc-scroll, .test-scroll {
+          display:flex !important; 
+          flex-wrap: nowrap !important;
+          gap:14px;
+          overflow-x:auto !important;
+          -webkit-overflow-scrolling:touch;
+          scroll-snap-type:x mandatory;
+          padding-bottom:16px;
+        }
+        .doc-scroll::-webkit-scrollbar, .test-scroll::-webkit-scrollbar {
+          display:none;
+        }
+        
+        .doc-card, .test-card {
+          flex-shrink: 0 !important;
+          scroll-snap-align: start;
+        }
+
+        .doc-card {
+          width: 260px;
+          background:var(--cream);
+          border-radius:14px;
+          overflow:hidden;
+          text-align:center;
+          border:1px solid #E8E0D0;
+        }
+        
+        .doc-photo {
+          height: 250px;
+          background: var(--w); 
+          display: flex;
+          align-items: flex-end; 
+          justify-content: center;
+          overflow: hidden;
+        }
+        .doc-photo img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain; 
+          object-position: bottom center; 
+        }
+        
+        .doc-info{padding:14px}
+        .doc-info h3{font-family:'Playfair Display',serif;font-size:16px;color:var(--gd);margin-bottom:2px}
+        .doc-info .cred{font-size:11px;color:var(--gold);font-weight:600}
+        .doc-info .spec{font-size:10px;color:var(--tl);text-transform:uppercase;letter-spacing:.5px;margin:3px 0}
+        .doc-info .exp{font-size:11px;color:var(--tm);margin-bottom:10px}
+        .btn-wa-doc{display:inline-flex;align-items:center;gap:5px;background:var(--wa);color:var(--w);padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;text-decoration:none}
+        .btn-wa-doc svg{width:14px;height:14px;fill:var(--w)}
+
+        .test-sec{background:var(--gp)}
+        .test-card{
+          width: 300px;
+          background:var(--w);
+          border-radius:14px;
+          padding:22px 18px;
+        }
+        .test-stars{color:var(--gold);font-size:15px;margin-bottom:10px;letter-spacing:2px}
+        .test-card blockquote{font-family:'Playfair Display',serif;font-size:14px;font-style:italic;color:var(--tm);line-height:1.6;margin-bottom:14px}
+        .test-author{display:flex;align-items:center;gap:10px}
+        .test-avatar{width:36px;height:36px;border-radius:50%;background:var(--gp);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gm);font-size:14px}
+        .test-name{font-weight:600;font-size:12px;color:var(--gd)}
+        .test-cond{font-size:10px;color:var(--tl)}
+        .test-badge{text-align:center;font-size:12px;color:var(--tm)}
+        .test-badge strong{color:var(--gd);font-size:14px}
+
+        .final-cta{background:var(--gd);padding:44px 20px;text-align:center;position:relative;overflow:hidden}
+        .final-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(45,107,69,.4),transparent 60%)}
+        .final-cta h2{font-family:'Playfair Display',serif;font-size:26px;color:var(--w);font-weight:700;position:relative;line-height:1.25;margin-bottom:6px}
+        .final-cta .sub{font-family:'Playfair Display',serif;font-style:italic;font-size:18px;color:var(--goldL);position:relative;margin-bottom:14px}
+        .final-cta .desc{font-size:13px;color:rgba(255,255,255,.75);position:relative;margin-bottom:24px;line-height:1.5}
+        .btn-wa-final{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--wa);color:var(--w);padding:18px 24px;border-radius:16px;font-size:17px;font-weight:800;text-decoration:none;width:100%;max-width:400px;margin:0 auto 10px;box-shadow:0 6px 28px rgba(37,211,102,.35);position:relative}
+        .btn-wa-final svg{width:24px;height:24px;fill:var(--w)}
+        .cta-note{font-size:11px;color:rgba(255,255,255,.45);position:relative;margin-bottom:20px}
+        .cta-trust{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 18px;position:relative;margin-bottom:28px}
+        .cta-trust span{color:rgba(255,255,255,.6);font-size:11px}
+        .mini-faq{position:relative;text-align:left;max-width:500px;margin:0 auto}
+        .mini-faq h3{font-family:'Playfair Display',serif;font-size:16px;color:var(--w);margin-bottom:14px;text-align:center}
+        .faq-q{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;margin-bottom:8px}
+        .faq-q strong{font-size:13px;color:var(--w);display:block;margin-bottom:4px}
+        .faq-q p{font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
+
+        .footer{background:var(--cream2);padding:32px 20px 20px;text-align:center}
+        .footer-brand{font-family:'Playfair Display',serif;font-size:18px;color:var(--gd);font-weight:700;margin-bottom:6px}
+        .footer-tag{font-family:'Playfair Display',serif;font-style:italic;font-size:13px;color:var(--gold);margin-bottom:14px}
+        .footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin-bottom:14px}
+        .footer-links a{font-size:12px;color:var(--tm);text-decoration:none}
+        .footer-social{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+        .footer-social a{width:36px;height:36px;border-radius:50%;background:var(--gd);display:flex;align-items:center;justify-content:center;color:var(--w);font-size:11px;font-weight:700;text-decoration:none;transition:background 0.3s;}
+        .footer-social a:hover{background:var(--wa);}
+
+        .footer-copy{font-size:11px;color:var(--tl)}
+
+        @media(min-width:1024px){
+          .header{padding:14px 60px}
+          .brand{font-size:20px}
+          .hamburger{display:none}
+          .mobile-menu{display:none}
+          .nav-d{display:flex;gap:28px;align-items:center}
+          .btn-wa-header{padding:10px 22px;font-size:13px}
+
+          .hero{padding:48px 60px 0;display:flex;gap:0;align-items:flex-start;min-height:550px}
+          .hero-text{max-width:520px;padding-top:40px;flex-shrink:0}
+          .hero h1{font-size:44px}
+          .hero-desc{font-size:16px}
+          .btn-wa-hero{width:fit-content;padding:18px 40px;font-size:17px}
+          
+          .hero-doctors{position:absolute;right:0;bottom:0;width:55%;margin-top:0;min-height:unset}
+          .hero-circle{width:650px;height:650px;right:-50px;top:40%;transform:translateY(-50%);background:var(--w);opacity:0.12}
+          
+          .doctor-avatar img{width:240px}
+          .doctor-placeholder:nth-child(2) .doctor-avatar img{width:320px}
+          .doctor-placeholder:nth-child(1){transform:translateX(100px)}
+          .doctor-placeholder:nth-child(3){transform:translateX(-100px)}
+          
+          /* Badges restore horizontal layout for desktop */
+          .float-badges{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);width:100%;max-width:900px;justify-content:center;padding:0;z-index:10;gap:16px;overflow:visible;}
+          .float-badge{flex:unset; flex-direction:row; padding:14px 24px; border-radius:16px;}
+          .float-badge .badge-icon{width:40px;height:40px;font-size:18px;}
+          .float-badge strong{font-size:14px; white-space:nowrap;}
+          .float-badge span{font-size:12px; white-space:nowrap;}
+
+          .schedule-bar{padding:16px 60px}
+          .schedule-bar p{font-size:16px}
+
+          /* GAP FIX FOR DESKTOP */
+          .conditions-sec { padding-bottom: 16px; }
+          .conditions-sec + .sec { padding-top: 32px; }
+          .cond-other{max-width:500px;margin:0 auto 0;}
+          
+          .sec{padding:56px 60px}
+          .sec-title{font-size:32px}
+          .sec-sub{font-size:15px;margin-bottom:36px}
+          .cond-cards{grid-template-columns:repeat(4,1fr);gap:16px;max-width:1000px;margin:0 auto 16px}
+          .cond-card{aspect-ratio:3/5}
+          .cond-overlay h3{font-size:20px}
+          .cond-overlay p{font-size:11px}
+          .steps{flex-direction:row;gap:20px;max-width:900px;margin:0 auto}
+          .step{flex:1;flex-direction:column;text-align:center;padding:24px 20px}
+          .step-num{margin:0 auto 12px}
+          
+          .doc-scroll { 
+            display: grid !important; 
+            grid-template-columns: repeat(4, 1fr) !important; 
+            gap: 24px !important;
+            overflow: visible !important; 
+          }
+          .doc-card { width: 100% !important; } 
+
+          .test-scroll { 
+            display: grid !important; 
+            grid-template-columns: repeat(3, 1fr) !important; 
+            gap: 24px !important;
+            overflow: visible !important; 
+          }
+          .test-card { width: 100% !important; } 
+
+          .final-cta{padding:64px 60px}
+          .final-cta h2{font-size:38px}
+          .btn-wa-final{width:auto;display:inline-flex;padding:20px 48px;font-size:18px}
+          .mini-faq{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;max-width:900px}
+          .mini-faq h3{grid-column:1/-1}
+        }
+        @media(min-width:768px) and (max-width:1023px){
+          .header{padding:14px 32px}
+          .hero{padding:36px 32px 0}
+          .hero h1{font-size:36px}
+          .sec{padding:44px 32px}
+          .steps{flex-direction:row;gap:14px}
+          .step{flex:1;flex-direction:column;text-align:center}
+          .step-num{margin:0 auto 10px}
+        }
       `}</style>
-
-      {/* --- WHATSAPP & CONTACT FLOATING BUTTONS --- */}
-      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-4 items-end pointer-events-none">
-        <button
-          onClick={() => navigate('/contact')}
-          className="pointer-events-auto bg-[#F5F3EA] border-2 border-[#2F6F4E]/20 text-[#2F6F4E] px-6 py-3 rounded-full shadow-xl flex items-center gap-3 group hover:bg-[#2F6F4E] hover:text-white transition-all transform hover:-translate-y-1"
-        >
-          <span className="material-symbols-outlined">mail</span>
-          <span className="font-bold text-sm tracking-tight">Contact Us</span>
-        </button>
-
-        <button
-          onClick={() => window.open('https://wa.me/919236313005', '_blank')}
-          className="pointer-events-auto bg-[#25D366] text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 group hover:scale-105 transition-all"
-        >
-          <div className="flex flex-col items-start leading-none">
-            <span className="text-[10px] font-bold uppercase tracking-wider opacity-90 mb-1">24/7 Help</span>
-            <span className="font-['Noto_Serif'] font-bold text-base">Book Consultation</span>
+      
+      <header className="header">
+        <div className="header-left">
+          <div className="logo-c">
+            <img src={logo} alt="logo" className="rounded-full" />
           </div>
-          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-            <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.522-2.961-2.638-.087-.117-.708-.941-.708-1.803 0-.863.453-1.288.613-1.465.16-.177.347-.222.463-.222h.334c.107 0 .25.04.385.372.144.354.493 1.203.536 1.291.043.088.07.19.013.31-.058.12-.088.191-.173.29-.086.1-.182.223-.26.305-.094.102-.191.213-.083.399.107.186.478.788 1.025 1.274.704.627 1.295.822 1.481.914.186.092.293.076.402-.049.108-.124.465-.54.589-.723.123-.183.246-.153.415-.091.17.062 1.077.508 1.263.601.187.093.31.139.355.213.045.074.045.432-.099.837z"></path></svg>
+          <span className="brand">AyurCare 360</span>
+        </div>
+        <nav className="nav-d">
+          <a href="#conditions">Conditions</a>
+          <a href="#doctors">Our Doctors</a>
+          <a href="#reviews">Reviews</a>
+          <a href="#faq">FAQ</a>
+          {isLoggedIn || fromStickyLogo ? (
+             <>
+               <span onClick={handleMenuAction}>Dashboard</span>
+               <span onClick={handleLogout}>Logout</span>
+             </>
+          ) : (
+             <span onClick={handleMenuAction}>Login</span>
+          )}
+        </nav>
+        <div style={{display:'flex', alignItems:'center', gap:'10px'}}>
+          <a href="https://wa.me/919452464680?text=Hi%2C%20I%27d%20like%20to%20consult%20an%20Ayurvedic%20doctor" className="btn-wa-header">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Chat with Doctor
+          </a>
+          <div className="hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <span></span><span></span><span></span>
           </div>
-        </button>
-      </div>
+        </div>
 
-      {/* --- TOP NAVBAR --- */}
-      <nav className="fixed top-0 w-full z-50 bg-[#F5F3EA]/90 backdrop-blur-xl border-b border-[#B8C1B6]/10 py-5 md:py-6">
-        <div className="flex justify-between items-center px-4 md:px-8 py-0 w-full max-w-screen-2xl mx-auto">
-          {/* Left: Logo & Brand */}
-          <div className="flex items-center gap-4 md:gap-6">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-white flex items-center justify-center border border-[#2F6F4E]/20 overflow-hidden shadow-sm">
-                <img alt="AyurCare360 Logo" className="w-full h-full object-cover p-1 rounded-full" src="/Favicon_up.png" />
-              </div>
-              <span className="text-lg md:text-xl font-['Noto_Serif'] font-bold text-[#2F6F4E] tracking-tight">AyurCare 360</span>
-            </Link>
-          </div>
-          {/* Right: CTA */}
-          <div className="flex items-center gap-4">
-            <div className="hidden lg:flex flex-col items-end mr-4">
-              <p className="text-[#1E1E1E]/70 font-['Noto_Serif'] text-sm tracking-wide font-medium">Talk to a real Ayurvedic doctor.</p>
-              <span className="text-[8px] md:text-[10px] text-[#C8A96A] font-medium tracking-wide uppercase opacity-90">First consultation at a guided fee</span>
-            </div>
-
+        {isMobileMenuOpen && (
+          <div className="mobile-menu">
+            <a href="#conditions" onClick={() => setIsMobileMenuOpen(false)}>Conditions</a>
+            <a href="#doctors" onClick={() => setIsMobileMenuOpen(false)}>Our Doctors</a>
+            <a href="#reviews" onClick={() => setIsMobileMenuOpen(false)}>Reviews</a>
+            <a href="#faq" onClick={() => setIsMobileMenuOpen(false)}>FAQ</a>
             {isLoggedIn || fromStickyLogo ? (
-              <div className="flex gap-2">
-                <button onClick={handleDashboardClick} className="bg-[#2F6F4E] hover:bg-[#2F6F4E]/90 text-white px-4 md:px-6 py-2 md:py-3 rounded-full font-['Noto_Serif'] text-xs md:text-sm tracking-tight shadow-sm hover:shadow-md transition-all active:scale-95 font-bold whitespace-nowrap">
-                  Dashboard
-                </button>
-                <button onClick={handleLogout} className="bg-white border border-red-200 text-red-600 hover:bg-red-50 px-4 md:px-6 py-2 md:py-3 rounded-full font-['Noto_Serif'] text-xs md:text-sm tracking-tight shadow-sm transition-all active:scale-95 font-bold whitespace-nowrap">
-                  Logout
-                </button>
-              </div>
+               <>
+                 <span onClick={() => { setIsMobileMenuOpen(false); handleMenuAction(); }}>Dashboard</span>
+                 <span onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }}>Logout</span>
+               </>
             ) : (
-              <button onClick={() => navigate('/login')} className="bg-[#2F6F4E] hover:bg-[#2F6F4E]/90 text-white px-4 md:px-6 py-2 md:py-3 rounded-full font-['Noto_Serif'] text-xs md:text-sm tracking-tight shadow-sm hover:shadow-md transition-all active:scale-95 font-bold whitespace-nowrap">
-                Login
-              </button>
+               <span onClick={() => { setIsMobileMenuOpen(false); handleMenuAction(); }}>Login</span>
             )}
           </div>
-        </div>
-      </nav>
+        )}
+      </header>
 
-      {/* --- HERO SECTION --- */}
-      <section className="relative min-h-screen w-full flex flex-col items-center justify-start overflow-hidden bg-[#F5F3EA] pt-24 md:pt-32">
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <span className="material-symbols-outlined absolute left-1/2 top-1/2 bird-1 text-[#2F6F4E]/30 text-4xl">nest_eco_leaf</span>
-          <span className="material-symbols-outlined absolute left-1/2 top-1/2 bird-2 text-[#5F8F6B]/30 text-3xl">nest_eco_leaf</span>
+      <section className="hero">
+        <div className="hero-text">
+          <div className="hero-pill"><span>🍃</span><span>Free Ayurvedic Consultation</span></div>
+          <h1>Online <span className="highlight">Ayurvedic</span> Consultation</h1>
+          <p className="hero-desc">Get <strong>free expert consultation</strong> from experienced BAMS-certified Ayurvedic doctors. Personalized diet, herbal guidance, and lifestyle plans. All on WhatsApp.</p>
+          <a href="https://wa.me/919452464680?text=Hi%2C%20I%27d%20like%20a%20free%20Ayurvedic%20consultation" className="btn-wa-hero">
+            <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            Start Your Free Consultation
+          </a>
+          <p className="hero-note">Verified Doctors · Respond within 30 minutes</p>
+        </div>
+
+        <div className="hero-doctors">
+          <div className="hero-circle"></div>
+          <div className="doctor-img-area">
+            <div className="doctor-placeholder"><div className="doctor-avatar"><img src={asthaBgremove} alt="Doc 1" /></div></div>
+            <div className="doctor-placeholder"><div className="doctor-avatar"><img src={atulBgremove} alt="Doc 2" /></div></div>
+            <div className="doctor-placeholder"><div className="doctor-avatar"><img src={mehakBgremove} alt="Doc 3" /></div></div>
+          </div>
+        </div>
+
+        <div className="float-badges">
+          <div className="float-badge"><div className="badge-icon">⏱️</div><div><strong>Avg Response: 30 min</strong><span>Across all doctors</span></div></div>
+          <div className="float-badge"><div className="badge-icon">⭐</div><div><strong>4.8 / 5 Rating</strong><span>1000+ consultations</span></div></div>
+          <div className="float-badge"><div className="badge-icon">🩺</div><div><strong>BAMS Certified</strong><span>Verified Ayurvedic doctors</span></div></div>
+        </div>
+      </section>
+
+      <div className="schedule-bar">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        <p>Chat with your Ayurvedic Doctor on WhatsApp Now</p>
+      </div>
+
+      <section className="sec conditions-sec" id="conditions">
+        <h2 className="sec-title">What are you experiencing?</h2>
+        <p className="sec-sub">Tap your concern to chat with a doctor on WhatsApp.</p>
+        <div className="cond-cards">
+          <a href="https://wa.me/919452464680?text=Hi%20Doctor%2C%20I%27m%20experiencing%20*skin%20issues*%20such%20as%20acne%2C%20psoriasis%2C%20eczema%2C%20or%20inflammation.%20I%27d%20like%20a%20free%20Ayurvedic%20consultation.%20Please%20help." className="cond-card">
+            <img src={skin_issue} alt="Skin Issues" className="cond-img" />
+            <div className="cond-overlay">
+              <h3>Skin Issues</h3>
+              <p>Acne, Psoriasis, Eczema, Rashes, Pigmentation, Inflammation</p>
+              <span className="cond-cta">Chat with Doctor &#8594;</span>
+            </div>
+          </a>
+          
+          <a href="https://wa.me/919452464680?text=Hi%20Doctor%2C%20I%27m%20experiencing%20*hair%20loss%20%2F%20hair%20thinning*.%20I%27d%20like%20a%20free%20Ayurvedic%20consultation%20for%20hair%20fall%2C%20dandruff%2C%20or%20premature%20greying.%20Please%20help." className="cond-card">
+            <img src={hair_loss} alt="Hair Loss" className="cond-img" />
+            <div className="cond-overlay">
+              <h3>Hair Loss</h3>
+              <p>Hair Fall, Thinning, Premature Greying, Dandruff, Scalp Issues</p>
+              <span className="cond-cta">Chat with Doctor &#8594;</span>
+            </div>
+          </a>
+          
+          <a href="https://wa.me/919452464680?text=Hi%20Doctor%2C%20I%27m%20experiencing%20*joint%20%2F%20bone%20pain*%20such%20as%20knee%20pain%2C%20arthritis%2C%20back%20pain%2C%20or%20stiffness.%20I%27d%20like%20a%20free%20Ayurvedic%20consultation.%20Please%20help." className="cond-card">
+            <img src={knee_pain} alt="Joint Pain" className="cond-img" />
+            <div className="cond-overlay">
+              <h3>Joint Pain</h3>
+              <p>Knee Pain, Arthritis, Back Pain, Stiffness, Inflammation</p>
+              <span className="cond-cta">Chat with Doctor &#8594;</span>
+            </div>
+          </a>
+          
+          <a href="https://wa.me/919452464680?text=Hi%20Doctor%2C%20I%20need%20help%20with%20*women%27s%20health*%20concerns%20such%20as%20PCOD%2FPCOS%2C%20irregular%20periods%2C%20weight%20gain%2C%20hormonal%20imbalance%2C%20or%20fertility.%20I%27d%20like%20a%20free%20Ayurvedic%20consultation.%20Please%20help." className="cond-card">
+            <img src={women_health} alt="Women's Health" className="cond-img" />
+            <div className="cond-overlay">
+              <h3>Women's Health</h3>
+              <p>PCOD/PCOS, Weight Gain, Irregular Periods, Hormonal Imbalance, Fertility</p>
+              <span className="cond-cta">Chat with Doctor &#8594;</span>
+            </div>
+          </a>
         </div>
         
-        {/* === UPDATED GLOBE & SANSKRIT RING LAYER === */}
-       <div className="relative z-10 w-full flex items-center justify-center overflow-visible mb-8 md:mb-12">
-          <div className="relative w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] flex items-center justify-center">
-            
-            {/* The Parent Container */}
-            <div className="relative w-full h-full flex items-center justify-center">
-              
-              {/* --- 1. THE SPINNING GLOBE (Background Layer) --- */}
-              <img 
-                alt="vibrant textured globe" 
-                className="absolute inset-0 w-full h-full object-cover rounded-full filter saturate-[1.4] contrast-[1.1] animate-[spin_20s_linear_infinite] z-0" 
-                src={globe} 
-              />
+        <a href="https://wa.me/919452464680?text=Hi%20Doctor%2C%20I%20have%20a%20health%20concern%20I%27d%20like%20to%20discuss.%20It%27s%20related%20to%20%5Bimmunity%20%2F%20digestion%20%2F%20anxiety%20%2F%20other%5D.%20I%27d%20like%20a%20free%20Ayurvedic%20consultation." className="cond-other">
+          <div className="emoji">🌿</div>
+          <div>
+            <strong>Something Else?</strong>
+            <span>Immunity, Digestion, Sleep, Anxiety, Diabetes, Thyroid & more</span>
+          </div>
+          <div className="arrow">&#8594;</div>
+        </a>
+      </section>
 
-              {/* --- 2. THE SANSKRIT RING (Foreground Layer) --- */}
-              <img 
-                src={sanskritRing} 
-                alt="Sanskrit Shloka ring" 
-                className="absolute top-1 left-1.1  w-[100%] h-[100%] max-w-none object-contain animate-[spin_20s_linear_infinite_reverse] z-10 drop-shadow-sm pointer-events-none"
-              />
-
+      <section className="sec">
+        <h2 className="sec-title">How It Works</h2>
+        <p className="sec-sub">Three steps. All on WhatsApp. All free.</p>
+        <div className="steps">
+          <div className="step">
+            <div className="step-num">1</div>
+            <div>
+              <h3>Start a Chat</h3>
+              <p>Tap the WhatsApp button. Say hi or tell us what's bothering you.</p>
             </div>
           </div>
-        </div>
-        
-        <ScrollReveal>
-          <div className="relative z-20 text-center px-6 max-w-4xl mx-auto pb-16 md:pb-20">
-            <h1 className="font-['Noto_Serif'] text-4xl sm:text-5xl md:text-7xl mb-4 md:mb-6 tracking-tighter text-[#1E1E1E] drop-shadow-sm font-bold">AyurCare 360</h1>
-            <h2 className="font-['Noto_Serif'] text-2xl md:text-4xl text-[#2E573B] mb-3 leading-tight font-bold">Ancient Wisdom.<br />Modern Care.</h2>
-            <p className="font-['Noto_Serif'] text-base md:text-xl italic text-[#5F8F6B] mb-4 font-bold">Your body has been speaking. It’s time to actually listen.</p>
-            <p className="font-['Inter'] text-base md:text-lg font-semibold text-[#1E1E1E]">Ayurveda, adapted for the life you live today.</p>
-          </div>
-        </ScrollReveal>
-      </section>
-
-      {/* --- HOW IT WORKS SECTION --- */}
-      <section className="py-24 md:py-32 bg-[#FAF4EB] border-y border-[#B8C1B6]/10">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12 text-center">
-          <ScrollReveal direction="up">
-            <h3 className="font-['Noto_Serif'] text-3xl md:text-5xl mb-16 md:mb-24 text-[#1E1E1E] font-bold">How It Works</h3>
-          </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-16 md:mb-20">
-            <ScrollReveal direction="up">
-              <div className="flex flex-col items-center p-8 bg-white rounded-3xl shadow-sm border border-[#B8C1B6]/10">
-                <div className="w-16 h-16 rounded-full bg-[#2F6F4E]/10 flex items-center justify-center mb-6 text-[#2F6F4E] font-bold text-2xl">1</div>
-                <h4 className="font-['Noto_Serif'] text-xl mb-4 font-bold text-[#1E1E1E]">Book Your Consultation</h4>
-                <p className="text-[#1E1E1E]/70 leading-relaxed font-['Inter']">Choose a time that works for you and connect with our expert physicians online.</p>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal direction="up">
-              <div className="flex flex-col items-center p-8 bg-white rounded-3xl shadow-sm border border-[#B8C1B6]/10">
-                <div className="w-16 h-16 rounded-full bg-[#2F6F4E]/10 flex items-center justify-center mb-6 text-[#2F6F4E] font-bold text-2xl">2</div>
-                <h4 className="font-['Noto_Serif'] text-xl mb-4 font-bold text-[#1E1E1E]">Understand Your Imbalance</h4>
-                <p className="text-[#1E1E1E]/70 leading-relaxed font-['Inter']">Identify your dosha and the root cause of your symptoms through deep clinical assessment.</p>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal direction="up">
-              <div className="flex flex-col items-center p-8 bg-white rounded-3xl shadow-sm border border-[#B8C1B6]/10">
-                <div className="w-16 h-16 rounded-full bg-[#2F6F4E]/10 flex items-center justify-center mb-6 text-[#2F6F4E] font-bold text-2xl">3</div>
-                <h4 className="font-['Noto_Serif'] text-xl mb-4 font-bold text-[#1E1E1E]">Receive Your Plan</h4>
-                <p className="text-[#1E1E1E]/70 leading-relaxed font-['Inter']">Get personalized guidance on herbs, nutrition, and daily rituals for sustainable healing.</p>
-              </div>
-            </ScrollReveal>
-          </div>
-          <ScrollReveal>
-            <button onClick={handleHeroAction} className="bg-[#2F6F4E] text-white px-8 md:px-12 py-4 md:py-5 rounded-full font-['Noto_Serif'] text-lg shadow-lg hover:shadow-xl transition-all active:scale-95 font-bold">
-              {fromStickyLogo ? 'Go to Dashboard' : (isLoggedIn ? 'Go to Dashboard' : 'Book Your Consultation')}
-            </button>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* --- PHILOSOPHY SECTION --- */}
-      <section className="py-16 md:py-32 bg-[#F5F3EA]">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12 text-center">
-          <div className="flex flex-col items-center">
-            <ScrollReveal>
-              <div className="mb-10 md:mb-16 relative w-full max-w-[500px] mx-auto">
-                <div className="absolute inset-0 rounded-full shadow-[0_20px_60px_rgba(0,0,0,0.15)] -z-10 transform scale-95"></div>
-                <img alt="a natural pink lotus flower blooming in a quiet pond with soft, realistic lighting" className="w-full aspect-square object-cover rounded-full shadow-2xl border-[8px] md:border-[12px] border-white/80 filter brightness-[0.95] contrast-[1.05]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAslwA-W6phmVMTgC6NBNyuXA8iKLEMV9bALIZ0DxuQ67O7lhyxpFmJMBcIaZGP8RPSxk0vw5r05-NefIsb5UnSxyXceYvDkmatGSlM1kV_8fEt9TcrVxhDvTKM2-64zpeEvrHPs8YWu3lOkaTTTxKEzA3lt7ztsaEjuIW2W1gQPHOWR7l02J2ziCty9MAYqpmyVyXc5I8SQR5zs62am2QNFrSmI001SgXV61-V11DFxSIcVdbOI5xOOL3Y61p7CB-lxLS76v6ZzZTL" />
-              </div>
-            </ScrollReveal>
-            <ScrollReveal direction="up">
-              <div className="max-w-4xl mx-auto space-y-10 md:space-y-16">
-                <h3 className="font-['Noto_Serif'] text-2xl md:text-5xl leading-tight text-[#1E1E1E] font-bold">
-                  Some things don’t need to be reinvented. They need to be remembered.
-                </h3>
-                <div className="space-y-6 md:space-y-10">
-                  <p className="font-['Noto_Serif'] text-xl md:text-4xl leading-[1.6] text-[#1E1E1E] font-medium">
-                    Ayurveda doesn’t treat parts. It understands patterns.
-                  </p>
-                  <p className="font-['Noto_Serif'] text-xl md:text-4xl leading-[1.6] text-[#1E1E1E] font-medium">
-                    When your lifestyle falls out of rhythm, your body reflects it.
-                  </p>
-                </div>
-                <p className="font-['Noto_Serif'] text-lg md:text-2xl text-[#2F6F4E] font-bold">
-                  Healing begins with understanding.
-                </p>
-              </div>
-            </ScrollReveal>
-          </div>
-        </div>
-      </section>
-
-      {/* --- CLARITY SECTION --- */}
-      <section className="py-20 md:py-48 bg-[#FAF4EB]">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16 mb-16 md:mb-24">
-            <div className="col-span-full text-center mb-8 md:mb-16 px-4">
-              <ScrollReveal>
-                <h3 className="font-['Noto_Serif'] text-3xl md:text-5xl text-[#1E1E1E] font-bold leading-tight">You don’t need more advice. You need clarity.</h3>
-              </ScrollReveal>
-            </div>
-            {[
-              { icon: 'medical_services', text: 'You’ll always speak to a real Ayurvedic doctor' },
-              { icon: 'search_insights', text: 'We focus on the root cause, not just symptoms' },
-              { icon: 'person_celebrate', text: 'Your plan is tailored to your lifestyle' },
-              { icon: 'verified', text: 'We guide you with what truly works' },
-            ].map((item, i) => (
-              <ScrollReveal key={i} direction="up">
-                <div className="flex flex-col items-center md:items-start text-center md:text-left hover:-translate-y-2 transition-all duration-500 group px-4">
-                  <div className="w-20 h-20 rounded-full bg-[#2F6F4E]/10 flex items-center justify-center mb-6">
-                    <span className="material-symbols-outlined text-[#2F6F4E] text-5xl">{item.icon}</span>
-                  </div>
-                  <h4 className="font-['Noto_Serif'] text-2xl mb-4 text-[#1E1E1E] font-bold">{item.text}</h4>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-          <div className="text-center">
-            <Link to="/about" className="inline-flex items-center gap-2 text-[#2F6F4E] font-bold text-lg md:text-xl hover:underline underline-offset-4">
-              See how your consultation works <span className="material-symbols-outlined">arrow_forward</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* --- ROOT MESSAGE SECTION --- */}
-      <section className="py-20 md:py-48 bg-[#F5F3EA] overflow-hidden">
-        <ScrollReveal>
-          <div className="max-w-screen-2xl mx-auto flex flex-col md:flex-row relative items-stretch min-h-[500px] md:min-h-[800px]">
-            <div className="flex-1 relative overflow-hidden min-h-[300px] md:min-h-0">
-              <img alt="flowing water in a natural stream" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApstvTz5hzkVEIUvDffEFDyibhAWKoYfTW8oor0FEu6U0TyOg8nbo8YwRNCL8cfdLYuHxJuKXr1fj2M4pHSDTpEMvLEI5j29wtliDCcxcBFs5IWQajuCXpxClmyoykOrxzB_3F9vBk9ThrCqGv8V1GdZ4IUUyH_dog8CvbT0a2bmmm1qccjlzWjlvXTp9pRrA1_j5kYybo81IXLrkStyGqaypOlAAxdZWE35mOKvBe5cTruTwEAQGTMQ1UarJKuaQL8Gfx10p40yrs" />
-            </div>
-            <div className="flex-1 relative overflow-hidden min-h-[300px] md:min-h-0">
-              <img alt="deep complex tree roots in soil" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNTLG-mvDBGL9c16SriGzoKPfTAWvTlJN3dhpVGrO5MtEr02fpyI7YuHwaPTkGqF_ylUoqEs0-wY0ssB5sCzfpjEwD07ApOta0DNHP-zuV71iJAtaIfjsM2-DZECV83FajN22ytpOB1x0Y-EusuTilmvVHRvZylyzKRouDt4xfgfEVLyDQVDT_oV94BdMl-ZsLft1MPdKP5o2DBT7ZNsyLrrKsrrhcNuwylzDpkm9ATXpR1oGWLCk_hYm1-JiLKtdKv1IFIsj-pmwn" />
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center p-6 md:p-12 text-center z-20 pointer-events-none">
-              <div className="max-w-3xl mx-auto bg-white p-10 md:p-20 shadow-2xl pointer-events-auto border border-[#B8C1B6]/10">
-                <h3 className="font-['Noto_Serif'] text-2xl md:text-5xl mb-6 md:mb-8 leading-tight text-[#1E1E1E] font-bold">Relief is temporary.<br /><span className="text-[#2F6F4E]">Understanding is permanent.</span></h3>
-                <p className="font-['Inter'] text-lg md:text-xl text-[#1E1E1E] leading-relaxed font-bold">Most systems stop at the surface. Ayurveda looks deeper — at the root.</p>
-              </div>
+          <div className="step">
+            <div className="step-num">2</div>
+            <div>
+              <h3>Talk to a Real Doctor</h3>
+              <p>A BAMS-certified physician replies within 30 minutes.</p>
             </div>
           </div>
-        </ScrollReveal>
-      </section>
-
-      {/* --- SIGNAL/DISRUPTION/ROOT --- */}
-      <section className="py-20 md:py-48 bg-[#FAF4EB] overflow-hidden">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-24 items-center">
-            <ScrollReveal direction="left">
-              <div className="relative">
-                <div className="absolute inset-0 bg-[#2F6F4E]/10 rounded-[2rem] md:rounded-[4rem] rotate-3 scale-105 -z-10"></div>
-                <img alt="a peaceful person sitting in a lush green forest in a calm side profile" className="w-full aspect-[4/5] object-cover rounded-[2rem] md:rounded-[4rem] shadow-2xl image-richness border-8 border-white/50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpZstdnGwh1H8L1uWWzBAP_A8geILju5Z3AzOW5EArq_cvYDSlFv2qp7QZb8SwbOrJY1X_7o3U-Dx6oSspxWouFL9_P8baYJzbhYYQ2CO6pagxYhE009VbwXWgpE5TwQYx-LCNouP35kRym9Sj9Ssx2pNi_GB-iYuyw7ZA08kU9FHjqrF5GBg8KoA7AXJyoxS3VAgWqdE--GomkmLvV7lcUeMHqJGWgaWJM91fWCJkSieepj7yjenQ2HJqx9kqdxZ61gSSqOGEcyq5" />
-              </div>
-            </ScrollReveal>
-            <ScrollReveal direction="right">
-              <div className="flex flex-col space-y-12 md:space-y-16">
-                <h3 className="font-['Noto_Serif'] text-4xl md:text-6xl text-[#1E1E1E] font-bold leading-tight">Signal, Disruption, The Root</h3>
-                <div className="space-y-10">
-                  <div className="relative pl-12 md:pl-16">
-                    <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-[#2F6F4E]/10 flex items-center justify-center text-[#2F6F4E] font-bold text-sm">1</div>
-                    <h4 className="font-['Noto_Serif'] text-2xl md:text-3xl text-[#2F6F4E] font-bold mb-4">The Signal</h4>
-                    <p className="font-['Inter'] text-lg md:text-xl text-[#1E1E1E]/80 leading-relaxed font-bold">Your body is constantly sending signals—fatigue, skin flares, or a racing mind. These aren't accidents; they're whispers.</p>
-                  </div>
-                  <div className="relative pl-12 md:pl-16">
-                    <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-[#2F6F4E]/10 flex items-center justify-center text-[#2F6F4E] font-bold text-sm">2</div>
-                    <h4 className="font-['Noto_Serif'] text-2xl md:text-3xl text-[#2F6F4E] font-bold mb-4">The Disruption</h4>
-                    <p className="font-['Inter'] text-lg md:text-xl text-[#1E1E1E]/80 leading-relaxed font-bold">Stress and environment create disruption in your Dosha balance, moving you away from your natural home state.</p>
-                  </div>
-                  <div className="relative pl-12 md:pl-16">
-                    <div className="absolute left-0 top-1 w-8 h-8 rounded-full bg-[#2F6F4E]/10 flex items-center justify-center text-[#2F6F4E] font-bold text-sm">3</div>
-                    <h4 className="font-['Noto_Serif'] text-2xl md:text-3xl text-[#2F6F4E] font-bold mb-4">The Root</h4>
-                    <p className="font-['Inter'] text-lg md:text-xl text-[#1E1E1E]/80 leading-relaxed font-bold">We don't just silence the symptom. We go to the root, using nature's pharmacy to restore the original equilibrium.</p>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
-        </div>
-      </section>
-
-      {/* --- COMPREHENSIVE CARE SECTION --- */}
-      <section className="py-20 md:py-48 bg-[#F5F3EA]">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
-          <ScrollReveal>
-            <h3 className="font-['Noto_Serif'] text-3xl md:text-5xl mb-12 md:mb-20 text-center text-[#1E1E1E] font-bold">Comprehensive Care, Rooted in Nature</h3>
-          </ScrollReveal>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ScrollReveal direction="left">
-              <div className="bg-[#FAF4EB] rounded-[12px] p-6 md:p-8 flex flex-col shadow-sm border border-[#B8C1B6]/10 h-full">
-                <div className="mb-8 overflow-hidden rounded-[12px]">
-                  <img alt="Fresh Ayurvedic herbs" className="w-full aspect-[4/3] object-cover image-richness" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2-6hucZvlYhi_24mw8bCk2gNE2tqTFrInvYCJi3-ZTHl1aIL5nJV4DWehuTj5TQ4jKvX7gYiA4sySDafsCezMBJhk9wuyjMpgjf3OeFWnuLPpcC759WOlmHQ2RV5YRWbdTyinn4YSrQewwbLgFzAo-0nGl0SZuYO20vf6sbV9luQhFlR45ecjLRMiqdZSCLzmK3iLNFxj1WmamkHVmw5U-tNG1ohxVR0CA07tq_ZzJdnEZiEk5Rr8bCTU-97iKSxqgr1mk6tNPgVW" />
-                </div>
-                <div className="mt-auto">
-                  <h4 className="font-['Noto_Serif'] text-2xl md:text-3xl mb-4 font-bold text-[#1E1E1E]">Deep Dosha Analysis</h4>
-                  <p className="font-['Inter'] text-lg text-[#1E1E1E]/80 leading-relaxed font-medium">A comprehensive breakdown of your metabolic type and current energetic deviations.</p>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            <div className="flex flex-col gap-6">
-              <ScrollReveal direction="right">
-                <div className="bg-[#2F6F4E] text-white rounded-[12px] p-6 md:p-8 flex flex-col justify-between shadow-md h-full">
-                  <div>
-                    <h4 className="font-['Noto_Serif'] text-2xl md:text-3xl mb-4 font-bold">1:1 Expert Consultation</h4>
-                    <p className="font-['Inter'] text-lg mb-8 opacity-90 font-medium">Speak with certified practitioners who listen to your story, not just your symptoms.</p>
-                  </div>
-                  <button onClick={handleHeroAction} className="bg-[#F5F3EA] text-[#2F6F4E] self-start px-8 py-3 rounded-full font-bold hover:bg-white transition-all flex items-center gap-2">
-                    {fromStickyLogo ? 'Go to Dashboard' : (isLoggedIn ? 'Go to Dashboard' : 'Book Now')} <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                  </button>
-                </div>
-              </ScrollReveal>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <ScrollReveal direction="up">
-                  <div className="bg-[#FAF4EB] rounded-[12px] p-6 md:p-8 flex flex-col shadow-sm border border-[#B8C1B6]/10">
-                    <h5 className="font-['Noto_Serif'] text-xl mb-4 font-bold text-[#1E1E1E]">Diet & Lifestyle</h5>
-                    <p className="font-['Inter'] text-base text-[#1E1E1E]/80 leading-relaxed font-medium">Customized meal plans that harmonize with your gut.</p>
-                  </div>
-                </ScrollReveal>
-                <ScrollReveal direction="up">
-                  <div className="bg-[#FAF4EB] rounded-[12px] p-6 md:p-8 flex flex-col shadow-sm border border-[#B8C1B6]/10">
-                    <h5 className="font-['Noto_Serif'] text-xl mb-4 font-bold text-[#1E1E1E]">Herbal Guidance</h5>
-                    <p className="font-['Inter'] text-base text-[#1E1E1E]/80 leading-relaxed font-medium">Precisely dosed botanicals for your unique constitution.</p>
-                  </div>
-                </ScrollReveal>
-              </div>
+          <div className="step">
+            <div className="step-num">3</div>
+            <div>
+              <h3>Get Your Plan</h3>
+              <p>Personalized diet chart, herbal guidance, and daily routine on WhatsApp.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* --- CONDITIONS SECTION --- */}
-      <section className="py-20 md:py-48 bg-[#F5F3EA]">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
-          <ScrollReveal>
-            <h3 className="font-['Noto_Serif'] text-3xl md:text-5xl mb-12 md:mb-24 text-center text-[#1E1E1E] leading-tight font-bold">Your body isn’t broken.<br /><span className="font-normal italic">It’s been trying to tell you something.</span></h3>
-          </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-16 md:mb-24">
-            {[
-              { title: "Skin Condition", desc: "Eczema, acne, inflammation, and recurring skin imbalances" },
-              { title: "Sleep & Anxiety", desc: "Disturbed sleep, anxiety, and stress-related imbalances" },
-              { title: "Metabolic Health", desc: "Diabetes and blood sugar irregularities" },
-              { title: "Joint & Bone Pain", desc: "Osteoarthritis, joint discomfort, and inflammation" }
-            ].map((cond, idx) => (
-              <ScrollReveal key={idx} direction="up">
-                <div className="p-8 md:p-12 rounded-2xl border-2 border-[#B8C1B6]/20 bg-[#FAF4EB]/50 hover:border-[#2F6F4E]/40 hover:bg-[#FAF4EB] transition-all duration-300 group shadow-sm flex flex-col justify-between min-h-[300px] md:min-h-[350px] text-center md:text-left">
-                  <div>
-                    <h5 className="font-['Noto_Serif'] text-2xl md:text-3xl mb-6 md:mb-8 text-[#1E1E1E] font-bold">{cond.title}</h5>
-                    <p className="font-['Inter'] text-[#1E1E1E] leading-relaxed text-lg md:text-xl font-bold">{cond.desc}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-          <ScrollReveal>
-            <div className="flex flex-col items-center gap-8">
-              <button onClick={handleHeroAction} className="bg-[#2F6F4E] text-white px-8 py-4 rounded-xl font-['Noto_Serif'] font-bold text-xl shadow-lg hover:scale-105 transition-transform">
-                {fromStickyLogo ? 'Go to Dashboard' : (isLoggedIn ? 'Go to Dashboard' : 'Start Healing for Your Condition')}
-              </button>
+      <section className="sec doctors-sec" id="doctors">
+        <h2 className="sec-title">Meet Your Doctors</h2>
+        <p className="sec-sub">Real doctors. Real conversations. Not chatbots.</p>
+        <div className="doc-scroll">
+
+          <div className="doc-card">
+            <div className="doc-photo"><img src={atulImg} alt="Dr. Atul Pandey" /></div>
+            <div className="doc-info">
+              <h3>Dr. Atul Pandey</h3>
+              <p className="cred">BAMS, MD</p>
+              <p className="spec">DIABETES, OBESITY & WEIGHT MANAGEMENT</p>
+              <p className="exp">3+ years · Hindi, English, Punjabi</p>
+              <a href="https://wa.me/919452464680?text=Hi%2C%20I%27d%20like%20to%20consult%20Dr.%20Atul" className="btn-wa-doc">
+                <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Chat With Me
+              </a>
             </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* --- DOCTOR SECTION --- */}
-      <section className="py-20 md:py-48 bg-[#F0E9DC]">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
-          <div className="flex flex-col md:flex-row gap-16 md:gap-24 items-center">
-            <ScrollReveal direction="left">
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="font-['Noto_Serif'] text-3xl md:text-5xl mb-6 md:mb-10 text-[#1E1E1E] leading-tight font-bold">Not a chatbot.<br /><span className="text-[#2F6F4E]">A real doctor who listens.</span></h3>
-                <p className="font-['Inter'] text-xl md:text-2xl text-[#1E1E1E] leading-relaxed mb-10 font-bold">We take time to understand your history, your habits, and your patterns — before we suggest anything.</p>
-                <div className="flex justify-center md:justify-start gap-8 md:gap-12 mb-10 md:mb-12">
-                  <div>
-                    <span className="block font-['Noto_Serif'] text-4xl md:text-5xl text-[#2F6F4E] font-bold mb-2">15+</span>
-                    <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#1E1E1E]">Years Experience</span>
-                  </div>
-                  <div className="w-px bg-[#B8C1B6]/40 h-12 self-center"></div>
-                  <div>
-                    <span className="block font-['Noto_Serif'] text-4xl md:text-5xl text-[#2F6F4E] font-bold mb-2">5k+</span>
-                    <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-[#1E1E1E]">Lives Healed</span>
-                  </div>
-                </div>
-                <button onClick={handleHeroAction} className="inline-flex items-center gap-2 text-[#2F6F4E] font-bold text-lg md:text-xl hover:underline underline-offset-4">
-                  {fromStickyLogo ? 'Go to Dashboard' : (isLoggedIn ? 'Go to Dashboard' : 'Meet all doctors')} <span className="material-symbols-outlined">arrow_forward</span>
-                </button>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal direction="right">
-              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-2xl">
-                <div className="flex flex-col gap-4 text-center md:text-left items-center md:items-start">
-                  <img alt="Ayurveda Physician Dr. Ananya Rao" className="w-full max-w-[300px] md:max-w-none aspect-[4/5] object-cover rounded-3xl shadow-xl image-richness border-4 border-white" src={asthaImg} />
-                  <div className="px-2 mt-4">
-                    <p className="font-['Noto_Serif'] text-xl text-[#1E1E1E] font-bold mb-0">Dr Astha Srivastava</p>
-                    <p className="text-[#2F6F4E] font-bold mb-1">BAMS, DRCH</p>
-                    <p className="text-sm text-[#1E1E1E] font-bold">3+ years experience</p>
-                    <p className="text-xs uppercase tracking-tighter text-[#1E1E1E] font-bold mt-1">Gyenec and obstetrics</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-4 text-center md:text-left items-center md:items-start mt-4 sm:mt-16">
-                  <img alt="Ayurveda Physician Dr. Vikram Shah" className="w-full max-w-[300px] md:max-w-none aspect-[4/5] object-cover rounded-3xl shadow-xl image-richness border-4 border-white" src={abhiImg} />
-                  <div className="px-2 mt-4">
-                    <p className="font-['Noto_Serif'] text-xl text-[#1E1E1E] font-bold mb-0">Dr Abhishek Bajpai </p>
-                    <p className="text-[#2F6F4E] font-bold mb-1">BAMS</p>
-                    <p className="text-sm text-[#1E1E1E] font-bold">5+ years experience</p>
-                    <p className="text-xs uppercase tracking-tighter text-[#1E1E1E] font-bold mt-1">Panchkarma & Skin Disorders</p>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
           </div>
-        </div>
-      </section>
-
-      {/* --- HEALING PHILOSOPHY SECTION --- */}
-      <section className="py-20 md:py-48 bg-[#F5F3EA]">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-center">
-            <ScrollReveal direction="left">
-              <div className="order-2 md:order-1 text-center md:text-left">
-                <h3 className="font-['Noto_Serif'] text-3xl md:text-5xl mb-6 md:mb-10 text-[#1E1E1E] leading-tight font-bold">Healing happens in daily life.</h3>
-                <p className="font-['Inter'] text-xl md:text-2xl text-[#1E1E1E] leading-relaxed mb-6 font-bold">The way you wake up. The way you eat. The way you move. These are not small things. They are your treatment.</p>
-                <p className="font-['Inter'] text-lg md:text-xl text-[#1E1E1E] leading-relaxed mb-10 font-medium md:mt-8">When you commit fully to the routine, your body begins to heal in ways you can feel.</p>
-                <Link to="/about" className="inline-flex items-center gap-2 text-[#2F6F4E] font-bold text-lg md:text-xl hover:underline underline-offset-4">
-                  Explore lifestyle guidance <span className="material-symbols-outlined">arrow_forward</span>
-                </Link>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal direction="right">
-              <div className="order-1 md:order-2 rounded-3xl overflow-hidden shadow-2xl">
-                <img alt="peaceful person practicing yoga in a lush green landscape at sunrise" className="w-full h-[400px] md:h-[600px] object-cover image-richness" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm3nDCimDgHO0Yi0H2_EBbqhlnQV6it-1Dp09Tn-ovtRDixj4x_Avllg8hR99LcpaEChyy_LA43Tq7wwHFe2UeOjQUkX_ZeGSFIrgX1E8Jb7xc4il9BQgyBPorrtMIItBiz1k4CLqkPSv_peTI-ukfFHmDVGElFVAryyVFjAZSdQjpN2T6nCKUq6OKUXjJyff8mBLz0F7Yti_lI71xDdZw0HGmYYOya7gcdTUZR5lFycWYDznfOrk6EpIpG1L6KhItFuifsETQODMp" />
-              </div>
-            </ScrollReveal>
-          </div>
-        </div>
-      </section>
-
-      {/* --- BLOG SECTION --- */}
-      <section className="py-20 md:py-32 bg-[#FAF4EB] border-y border-[#B8C1B6]/10">
-        <div className="max-w-screen-xl mx-auto px-6 md:px-12">
-          <ScrollReveal>
-            <div className="text-center mb-12">
-              <h3 className="font-['Noto_Serif'] text-3xl md:text-5xl text-[#1E1E1E] font-bold mb-4">The Herbarium</h3>
-              <p className="font-['Inter'] text-xl text-[#1E1E1E]/70 max-w-2xl mx-auto">Latest insights on holistic healing and ancient wellness practices.</p>
+          
+          <div className="doc-card">
+            <div className="doc-photo"><img src={asthaImg} alt="Dr. Astha Srivastava" /></div>
+            <div className="doc-info">
+              <h3>Dr. Astha Srivastava</h3>
+              <p className="cred">BAMS, DRCH</p>
+              <p className="spec">GYNECOLOGY & OBSTETRICS</p>
+              <p className="exp">4+ years · Hindi, English</p>
+              <a href="https://wa.me/919452464680?text=Hi%2C%20I%27d%20like%20to%20consult%20Dr.%20Astha" className="btn-wa-doc">
+                <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Chat With Me
+              </a>
             </div>
-          </ScrollReveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center mb-12">
-            {websiteBlogs.slice(0, 3).map((blog, idx) => (
-              <ScrollReveal key={blog.id} direction="up">
-                <Link to={`/blogs/${blog.id}`} className="bg-white rounded-[24px] border border-[#B8C1B6]/10 shadow-sm overflow-hidden group cursor-pointer flex flex-col h-full hover:shadow-md transition-shadow">
-                  <div className="h-48 overflow-hidden">
-                    <img src={blog.image} alt={blog.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  </div>
-                  <div className="p-8 flex-1 flex flex-col">
-                    <p className="text-[10px] font-bold text-[#C8A96A] uppercase tracking-widest mb-3">{blog.category}</p>
-                    <h3 className="font-['Noto_Serif'] text-xl font-bold text-[#1E1E1E] mb-4 line-clamp-2">{blog.title}</h3>
-                    <p className="font-['Inter'] text-sm text-[#1E1E1E]/80 mb-6 line-clamp-3">{blog.excerpt}</p>
-                    <button className="mt-auto text-sm font-bold text-[#2F6F4E] flex items-center gap-2 group-hover:gap-3 transition-all">
-                      Read Article <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                    </button>
-                  </div>
-                </Link>
-              </ScrollReveal>
-            ))}
           </div>
-          <div className="text-center">
-            <Link to="/blogs" className="border-2 border-[#2F6F4E] text-[#2F6F4E] hover:bg-[#2F6F4E] hover:text-white px-8 py-3 rounded-full font-bold transition-all inline-block">
-              View All Articles
-            </Link>
+          
+          <div className="doc-card">
+            <div className="doc-photo"><img src={abhiImg} alt="Dr. Abhishek Sharma" /></div>
+            <div className="doc-info">
+              <h3>Dr. Abhishek Sharma</h3>
+              <p className="cred">BAMS</p>
+              <p className="spec">PANCHAKARMA & PAIN MANAGEMENT</p>
+              <p className="exp">3+ years · Hindi, English</p>
+              <a href="https://wa.me/919452464680?text=Hi%2C%20I%27d%20like%20to%20consult%20Dr.%20Abhishek" className="btn-wa-doc">
+                <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Chat With Me
+              </a>
+            </div>
           </div>
+
+          <div className="doc-card">
+            <div className="doc-photo"><img src={mehakImg} alt="Dr. Mehak" /></div>
+            <div className="doc-info">
+              <h3>Dr. Mehak</h3>
+              <p className="cred">BAMS, MD</p>
+              <p className="spec">LIVER AND KIDNEY DISORDERS</p>
+              <p className="exp">5+ years · Hindi, English, Punjabi</p>
+              <a href="https://wa.me/919452464680?text=Hi%2C%20I%27d%20like%20to%20consult%20Dr.%20Mehak" className="btn-wa-doc">
+                <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Chat With Me
+              </a>
+            </div>
+          </div>
+          
         </div>
       </section>
 
-      {/* --- COMMITMENT SECTION --- */}
-      <section className="py-20 md:py-48 bg-[#F5F3EA] border-y border-[#B8C1B6]/10">
-        <div className="max-w-5xl mx-auto px-6 md:px-12 text-center">
-          <ScrollReveal direction="up">
-            <div className="flex flex-col items-center mb-8 md:mb-12">
-              <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#2F6F4E]/10 flex items-center justify-center mb-6">
-                <img alt="AyurCare360 Logo" className="w-full h-full object-cover p-1 rounded-full" src="/Favicon_up.png" />
+      <section className="sec test-sec" id="reviews">
+        <h2 className="sec-title">Real Patients. Real Results.</h2>
+        <p className="sec-sub">From people who chose a different path to healing.</p>
+        <div className="test-scroll">
+          <div className="test-card">
+            <div className="test-stars">★★★★★</div>
+            <blockquote>"3 months with AyurCare 360 and my chronic acne cleared completely. Dr. Astha understood my body like no one before."</blockquote>
+            <div className="test-author">
+              <div className="test-avatar">P</div>
+              <div>
+                <p className="test-name">Priya M.</p>
+                <p className="test-cond">Chronic Acne · Delhi</p>
               </div>
-              <div className="w-24 h-[3px] bg-[#2F6F4E]/30"></div>
             </div>
-            <h3 className="font-['Noto_Serif'] text-3xl md:text-6xl mb-6 md:mb-8 text-[#1E1E1E] font-bold leading-tight">Healing works — when you do.</h3>
-            <p className="font-['Inter'] text-lg md:text-2xl text-[#1E1E1E] leading-relaxed mb-4 md:mb-6 font-bold italic">Consistency and honesty with your routine change everything.</p>
-            <p className="font-['Noto_Serif'] text-xl md:text-3xl text-[#2F6F4E] mb-6 md:mb-8 font-bold">प्रकृति के साथ, संतुलन की ओर</p>
-            <p className="font-['Inter'] text-base md:text-xl text-[#1E1E1E] leading-relaxed mb-8 md:mb-12 max-w-3xl mx-auto font-bold">Your body already knows how to heal. It just needs your absolute discipline and awareness to return to its natural state.</p>
-            <div className="w-24 md:w-32 h-[2px] bg-[#2F6F4E] mx-auto"></div>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* --- FINAL CTA SECTION --- */}
-      <section className="py-12 md:py-16 bg-[#2F6F4E] text-white relative overflow-hidden px-6">
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute -top-24 -left-24 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-white/10 rounded-full blur-[60px] md:blur-[120px]"></div>
-          <div className="absolute -bottom-24 -right-24 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-black/10 rounded-full blur-[60px] md:blur-[120px]"></div>
-        </div>
-        <ScrollReveal>
-          <div className="max-w-screen-xl mx-auto flex flex-col items-center text-center relative z-10 px-4">
-            <h2 className="font-['Noto_Serif'] text-3xl md:text-5xl lg:text-6xl mb-4 md:mb-6 max-w-4xl leading-tight font-bold">Start with one conversation.<br /><span className="italic font-normal opacity-90">It might change everything.</span></h2>
-            <p className="font-['Inter'] text-base md:text-xl mb-6 md:mb-8 text-white font-bold max-w-2xl">Talk to a doctor who understands your body — not just your symptoms.</p>
-            <div className="flex flex-col items-center gap-4 mb-8 md:mb-10 w-full">
-              <button onClick={handleHeroAction} className="bg-[#F5F3EA] text-[#1E1E1E] hover:bg-white w-full sm:w-auto px-8 md:px-12 py-4 md:py-5 rounded-xl font-['Noto_Serif'] text-lg md:text-2xl shadow-2xl transition-all transform hover:-translate-y-1 active:scale-95 font-bold border-2 border-transparent">
-                {fromStickyLogo ? 'Go to Dashboard' : (isLoggedIn ? 'Go to Dashboard' : 'Book My Consultation')}
-              </button>
-              <p className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/80">Limited consultation slots available</p>
+          </div>
+          <div className="test-card">
+            <div className="test-stars">★★★★★</div>
+            <blockquote>"Was skeptical about Ayurveda for anxiety. The personalized routine made a real difference within weeks. Sleeping better than I have in years."</blockquote>
+            <div className="test-author">
+              <div className="test-avatar">R</div>
+              <div>
+                <p className="test-name">Rahul K.</p>
+                <p className="test-cond">Sleep & Anxiety · Mumbai</p>
+              </div>
             </div>
-            <p className="font-['Inter'] text-sm md:text-lg opacity-90 text-white font-bold">Private. Personal. No pressure.</p>
           </div>
-        </ScrollReveal>
+          <div className="test-card">
+            <div className="test-stars">★★★★★</div>
+            <blockquote>"The diet plan was so practical. Not a single ingredient I couldn't find locally. Bloating and reflux are finally under control."</blockquote>
+            <div className="test-author">
+              <div className="test-avatar">A</div>
+              <div>
+                <p className="test-name">Ananya S.</p>
+                <p className="test-cond">Digestive Health · Bangalore</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p className="test-badge"><strong>4.8/5</strong> from <strong>500+</strong> verified reviews</p>
       </section>
 
-      {/* --- TAGLINE SECTION --- */}
-      <section className="py-12 bg-[#F3EDE3] text-center px-6">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-4">
-            <img
-              alt="AyurCare360 Logo"
-              className="w-8 h-8 object-cover p-1 rounded-full bg-white shadow-sm"
-              src="/Favicon_up.png"
-            />
-            <span className="material-symbols-outlined text-[#376645] text-2xl">history_edu</span>
-          </div>
-          <p className="font-['Noto_Serif'] italic text-xl md:text-3xl text-[#376645]">Built by doctors. Guided by honesty.</p>
+      <section className="final-cta" id="faq">
+        <h2>Start with one message.</h2>
+        <p className="sub">It might change everything.</p>
+        <p className="desc">Talk to a real Ayurvedic doctor on WhatsApp. Not a chatbot. Not a form.</p>
+        <a href="https://wa.me/919452464680?text=Hi%2C%20I%27d%20like%20a%20free%20Ayurvedic%20consultation" className="btn-wa-final">
+          <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Chat with a Doctor — FREE
+        </a>
+        <p className="cta-note">100% Free · Replies within 30 min · No app needed</p>
+        <div className="cta-trust"><span>🔒 Confidential</span><span>🛡️ BAMS Certified</span><span>💬 Real Doctors</span></div>
+        <div className="mini-faq">
+          <h3>Quick Answers</h3>
+          <div className="faq-q"><strong>Is it really free?</strong><p>Yes. Your first consultation on WhatsApp is completely free. No card, no catch.</p></div>
+          <div className="faq-q"><strong>Who will reply?</strong><p>A real BAMS-certified Ayurvedic doctor. Not a bot, not an assistant.</p></div>
+          <div className="faq-q"><strong>How fast is the reply?</strong><p>Most patients hear back within 30 minutes during 9 AM - 9 PM IST.</p></div>
         </div>
       </section>
 
-      {/* --- FOOTER --- */}
-      <footer className="w-full bg-[#F3EDE3] border-t border-[#376645]/10 pt-8 pb-16 px-6">
-        <div className="max-w-screen-xl mx-auto flex flex-col items-center text-center px-4">
-          {/* Logo */}
-          <div className="mb-8 md:mb-10">
-            <span className="text-2xl md:text-3xl font-['Noto_Serif'] italic text-[#376645] font-bold">AyurCare 360</span>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="flex flex-wrap justify-center gap-x-6 md:gap-x-12 gap-y-4 mb-8">
-            <Link to="/blogs" className="text-[#376645] font-['Inter'] text-sm md:text-base font-medium hover:opacity-70 transition-opacity">The Herbarium</Link>
-            <Link to="/privacy" className="text-[#376645] font-['Inter'] text-sm md:text-base font-medium hover:opacity-70 transition-opacity">Privacy Policy</Link>
-            <Link to="/login" className="text-[#376645] font-['Inter'] text-sm md:text-base font-medium hover:opacity-70 transition-opacity">Practitioner Login</Link>
-          </nav>
-
-          {/* Social Icons */}
-          <div className="flex justify-center gap-6 mb-10">
-            <a href="https://www.facebook.com/share/18TNZK4jCS/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-[#376645] hover:opacity-70 transition-opacity">
-              <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
-              </svg>
-            </a>
-
-            <a href="https://www.instagram.com/ayurcare.360?igsh=Nm45MTBrbnk3ZG9z" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-[#376645] hover:opacity-70 transition-opacity">
-              <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
-              </svg>
-            </a>
-          </div>
-          {/* Copyright */}
-          <div className="max-w-2xl">
-            <p className="text-[#376645] font-['Inter'] text-xs md:text-sm leading-relaxed opacity-90">
-              © {new Date().getFullYear()} AyurCare 360. Guided by tradition, lead by doctors. Every leaf tells a story of healing.
-            </p>
-          </div>
+      <footer className="footer">
+        <div className="footer-brand">AyurCare 360</div>
+        <div className="footer-tag">Built by doctors. Guided by tradition. Led by honesty.</div>
+        <div className="footer-links">
+          <Link to="/about">About</Link>
+          <a href="#doctors" onClick={() => setIsMobileMenuOpen(false)}>Doctors</a>
+          <Link to="/privacy">Privacy Policy</Link>
+          <Link to="/terms">Terms</Link>
+          <Link to="/contact">Contact</Link>
         </div>
+        <div className="footer-social">
+          <a href="http://facebook.com/61577539592430/" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z"/>
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/ayurcare.360?igsh=Nm45MTBrbnk3ZG9z" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+            </svg>
+          </a>
+        </div>
+        <p className="footer-copy">© 2026 AyurCare 360. All rights reserved.</p>
       </footer>
-    </div>
+    </>
   );
 };
 

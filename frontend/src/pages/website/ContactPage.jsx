@@ -15,7 +15,7 @@ const ContactPage = () => {
     const message = formData.get('message');
 
     // Your receiving email address
-    const targetEmail = "sharmaaryan3820@gmail.com";
+    const targetEmail = "ayurcare948@gmail.com";
 
     // Construct the mailto link
     const mailtoLink = `mailto:${targetEmail}?subject=New Contact Inquiry from ${encodeURIComponent(name)}&body=Name: ${encodeURIComponent(name)}%0D%0AEmail: ${encodeURIComponent(email)}%0D%0A%0D%0AMessage:%0D%0A${encodeURIComponent(message)}`;
@@ -84,7 +84,7 @@ const ContactPage = () => {
                   <p className="text-gray-500 font-medium text-sm mb-8">24/7 support available for your wellness journey.</p>
                   <a
                     className="inline-flex items-center justify-center bg-[#3A6447] hover:bg-[#2C4D36] text-white px-8 py-4 rounded-full font-bold text-sm transition-colors shadow-sm"
-                    href="https://wa.me/919236313005"
+                    href="https://wa.me/919452464680?text=Hi%2C%20I%27d%20like%20a%20free%20Ayurvedic%20consultation"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
