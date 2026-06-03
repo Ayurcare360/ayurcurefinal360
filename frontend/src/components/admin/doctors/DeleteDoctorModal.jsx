@@ -1,8 +1,9 @@
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
-const DeleteDoctorModal = ({ doctor, onClose, onConfirm }) => {
-  if (!doctor) return null;
+const DeleteDoctorModal = ({ isOpen, onClose, onConfirm, selectedCount, doctorName }) => {
+  // Use isOpen to control rendering instead of checking for a doctor object
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-in fade-in duration-200">
@@ -16,14 +17,16 @@ const DeleteDoctorModal = ({ doctor, onClose, onConfirm }) => {
             <AlertTriangle size={32} />
           </div>
 
-          <h3 className="text-xl font-extrabold text-gray-900 mb-2">Remove Doctor Profile?</h3>
+          <h3 className="text-xl font-extrabold text-gray-900 mb-2">
+            {selectedCount > 1 ? `Remove ${selectedCount} Doctors?` : 'Remove Doctor Profile?'}
+          </h3>
           <p className="text-sm font-medium text-gray-500 leading-relaxed mb-8">
-            You are about to permanently delete <span className="font-bold text-gray-900">{doctor.name}'s</span> profile. This action will remove their access and delist them from the platform. This cannot be undone.
+            You are about to permanently delete <span className="font-bold text-gray-900">{selectedCount === 1 && doctorName ? `${doctorName}'s` : 'these'}</span> profile{selectedCount > 1 ? 's' : ''}. This action will remove their access and delist them from the platform. This cannot be undone.
           </p>
 
           <div className="flex w-full gap-3">
             <button onClick={onClose} className="flex-1 py-3 bg-gray-50 hover:bg-gray-100 text-gray-700 font-bold rounded-2xl transition-colors text-sm">
-              Keep Profile
+              Keep Profile{selectedCount > 1 ? 's' : ''}
             </button>
             <button onClick={onConfirm} className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl transition-colors shadow-sm text-sm">
               Yes, Remove
@@ -34,4 +37,5 @@ const DeleteDoctorModal = ({ doctor, onClose, onConfirm }) => {
     </div>
   );
 };
+
 export default DeleteDoctorModal;

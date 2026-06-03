@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-// THE FIX: Added Image as ImageIcon to your imports
 import { Search, Plus, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { adminApi } from '../../../api/adminApi';
+import DeleteProductModal from './DeleteProductModal';
 
 const InventoryTable = ({ products = [], categories = [] }) => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [catFilter, setCatFilter] = useState('All');
+    
+    // Modal states
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedIds, setSelectedIds] = useState([]);
 
     // Make sure this matches your backend port!
     const BACKEND_URL = 'http://localhost:5000';
@@ -18,26 +22,44 @@ const InventoryTable = ({ products = [], categories = [] }) => {
         return matchSearch && matchCat;
     });
 
+    const handleConfirmDelete = async () => {
+        try {
+            for (const id of selectedIds) {
+                await adminApi.deleteProduct(id);
+            }
+            // Close modal and clear selection
+            setSelectedIds([]); 
+            setIsDeleteModalOpen(false); 
+            // Reload page to reflect changes
+            window.location.reload();
+        } catch (error) {
+            console.error("Failed to delete product:", error);
+            alert("Failed to delete. Check your backend console.");
+            setIsDeleteModalOpen(false);
+        }
+    };
+
     const getStatusColor = (status) => {
         if (status === 'In Stock') return 'bg-green-50 text-green-700';
         if (status === 'Low Stock') return 'bg-amber-50 text-amber-700';
         return 'bg-red-50 text-red-700';
     };
 
-    const handleDelete = async (productId) => {
-        if (window.confirm("Are you sure you want to delete this product?")) {
-            try {
-                await adminApi.deleteProduct(productId);
-                window.location.reload();
-            } catch (error) {
-                console.error("Failed to delete product:", error);
-                alert("Failed to delete. Check your backend console.");
-            }
-        }
-    };
-
     return (
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col relative">
+            
+            {/* The Custom Delete Modal */}
+            <DeleteProductModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => {
+                    setIsDeleteModalOpen(false);
+                    setSelectedIds([]);
+                }}
+                onConfirm={handleConfirmDelete}
+                selectedCount={selectedIds.length}
+                productName={selectedIds.length === 1 ? products.find(p => p.id === selectedIds[0])?.name : ''}
+            />
+
             <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between gap-4">
                 <div className="flex items-center gap-4 flex-1">
                     <div className="relative max-w-sm w-full">
@@ -49,7 +71,7 @@ const InventoryTable = ({ products = [], categories = [] }) => {
                         />
                     </div>
                     <select
-                        className="bg-gray-50 py-2.5 px-4 rounded-2xl text-sm font-bold text-gray-600 outline-none border-none"
+                        className="bg-gray-50 py-2.5 px-4 rounded-2xl text-sm font-bold text-gray-600 outline-none border-none cursor-pointer"
                         value={catFilter} onChange={(e) => setCatFilter(e.target.value)}
                     >
                         <option value="All">All Categories</option>
@@ -59,7 +81,7 @@ const InventoryTable = ({ products = [], categories = [] }) => {
 
                 <button
                     onClick={() => navigate('/admin/inventory/add')}
-                    className="bg-[#3A6447] text-white px-5 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 hover:bg-[#2C4D36] transition-colors"
+                    className="bg-[#3A6447] text-white px-5 py-2.5 rounded-2xl text-sm font-bold flex items-center gap-2 hover:bg-[#2C4D36] transition-colors cursor-pointer"
                 >
                     <Plus size={16} /> Add Product
                 </button>
@@ -80,7 +102,6 @@ const InventoryTable = ({ products = [], categories = [] }) => {
                     <tbody className="divide-y divide-gray-50">
                         {filteredProducts.map((product) => (
                             <tr key={product.id} className="hover:bg-gray-50/50 transition-colors">
-                                {/* THE FIX: Added the Image Thumbnail layout here */}
                                 <td className="px-6 py-4 flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-lg border border-gray-100 overflow-hidden bg-white flex-shrink-0 flex items-center justify-center">
                                         {product.image_url ? (
@@ -107,13 +128,17 @@ const InventoryTable = ({ products = [], categories = [] }) => {
                                 <td className="px-6 py-4 text-right whitespace-nowrap">
                                     <button
                                         onClick={() => navigate(`/admin/inventory/edit/${product.id}`)}
-                                        className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors mr-2"
+                                        className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition-colors mr-2 cursor-pointer outline-none"
                                     >
                                         <Edit2 size={16} />
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(product.id)}
-                                        className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                                        onClick={() => {
+                                            // Trigger Modal instead of window.confirm
+                                            setSelectedIds([product.id]);
+                                            setIsDeleteModalOpen(true);
+                                        }}
+                                        className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors cursor-pointer outline-none"
                                     >
                                         <Trash2 size={16} />
                                     </button>
